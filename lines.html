@@ -1,0 +1,56 @@
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>js Lines</title>
+		<link rel="stylesheet" type="text/css" href="lines.css" />
+		<script type="text/javascript" src="jquery-1.4.2.js"></script>
+		<script type="text/javascript">
+			width = 3;
+			height = 3;
+			jQuery(document).ready(function(){
+				var gameArea = $("#gameArea");
+				var html = "<table>";
+				for (y=0; y<height; y++) {
+					html = html + "<tr>";
+					for (x=0; x<width; x++) {
+						<!-- "<img src='img/collaboration.png' id='" + x + "-" + y + "'/>" -->
+						html = html + "<td class='cell' id='" + x + "-" + y + "'>&nbsp;</td>";
+					}
+					html = html + "</tr>";
+				}
+				html = html + "</table>";
+				// alert(html);
+				gameArea.append(html);
+				disco(0, 0);
+			 });
+			 
+			 function disco(cellNr, styleNr) {
+				/*for (y=0; y<height; y++) {
+					for (x=0; x<width; x++) {
+						cell = 
+					}
+				}*/
+				
+				var x = cellNr%width;
+				var y = Math.floor(cellNr/height);
+				var cell = $("#"+x+"-"+y);
+				console.log("cellNr=" + cellNr + ", x="+x+", y="+y + ", id=" + ("#"+x+"-"+y) +", cell=" + cell + ", cell.css.background=" + cell.css("background-color"));
+				//cell.css("background-image", "style1");
+				cell.removeClass("style" + (styleNr-1));
+				cell.addClass("style"+styleNr);
+				//console.log("  -> cell.css.background=" + cell.css("background-color"));
+				if (cellNr<width*height-1) {
+					setTimeout("disco("+(1+cellNr)+","+styleNr+")", 100);
+				}
+				else if (styleNr < 13) {
+					setTimeout("disco(0,"+(1+styleNr)+")", 100);
+				}
+			 }
+		</script>
+	</head>
+	<body>
+		<h1>jsLines</h1>
+		<div id="gameArea"></div>
+		&copy;2000-2010 Andrei Solntsev
+	</body>
+</html>
