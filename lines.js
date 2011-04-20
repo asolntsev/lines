@@ -1,13 +1,32 @@
 var width = 10;
 var height = 10;
 var selectedCellId = -1;
-var freeCells = width*height;
-var cellStyles=new Array();
+var freeCells;
+var cellStyles=[];
 var gameStarted = false;
 
 var animation = false;
 var animationPath;
 var animationStep;
+
+var eventProcessingThread;
+var queue = [];
+
+function enqueue(func) {
+	queue.push(func);
+}
+
+var runEventProcessingThread = function() {
+	while (queue.length > 0) {
+		var firstAction = queue.shift();
+		firstAction();
+	}
+	eventProcessingThread = setTimeout(runEventProcessingThread, 100);
+}
+
+var stopEventProcessingThread = function() {
+	clearTimeout(eventProcessingThread);
+}
 
 function createField() {
 	var gameArea = $("#gameArea");
@@ -26,46 +45,59 @@ function createField() {
 	return gameArea;
 }
  
-function startGame() {
+var startGame = function() {
 	selectedCellId = -1;
+	freeCells = width*height;
 	
-	 for (var i=0; i < width*height; i++) {
+	for (var i=0; i < width*height; i++) {
 		cellStyles[i] = "";
+		getCell(i).removeClass( 'filled' );
 	}
 	
-	fillNextCells();
 	gameStarted = true;
-	paint();
+	enqueue(fillNextCells);
  }
  
  function getRandomCellId() {
 	return Math.floor(width*height*Math.random());
  }
  
- function getRandomStyle() {
+function getRandomStyle() {
 	return "style" + Math.floor(14*Math.random());
- }
- 
- function fillNextCells() {
+}
+
+var gameOver = function() {
+	gameStarted = false;
+	if (confirm("Game over...  Play againg?")){
+		enqueue(startGame);
+	}
+}
+
+function _findFreeCell() {
+	var cellId = getRandomCellId();
+	while (cellStyles[cellId] != "") {
+		var cellId = getRandomCellId();
+	}
+	return cellId;
+}
+
+var fillNextCells = function() {
 	 if (freeCells < 3) {
-		gameStarted = false;
-		if (confirm("Game over...  Play againg?")){
-			startGame();
-		}
+		enqueue(gameOver);
 	}
 	for (var i=0; i<3; i++) {
-		var cellId = getRandomCellId();
-		while (cellStyles[cellId] != "") {
-			var cellId = getRandomCellId();
-		}
+		var cellId = _findFreeCell();
 		// console.log("next cell: " + cellId);
 		fillCell(cellId, getRandomStyle());
 	}
+	enqueue(paint);
  }
  
  function fillCell(cellId, cellStyle) {
 	cellStyles[cellId] = cellStyle;
+	getCell(cellId).addClass( 'filled' );
 	getCell(cellId).addClass( cellStyle );
+	freeCells--;
  }
  
  function getCell(cellNr) {
@@ -87,33 +119,43 @@ function onCellClicked(cell) {
 		// clicked the same cell. Nothing to do.
 		return;
 	}
+	/*
 	else if (hasSelectedCell()) {
-		// restore previously selected cell
+		// restore previously selected cell    // WTF?
 		getSelectedCell().addClass(cellStyles[selectedCellId]);
 	}
+	*/
 	
 	if (cellStyles[cell.id] == "") {
-		// User clicked empty cell - let's find path to it
-		var path = findPath(selectedCellId, cell.id);
-		if (path == null) {
-			// path not found
-			console.log("path not found");
-		}
-		else {
-			console.log("path is found: " + path);
-			animation = true;
-			animationPath = path;
-			animationStep = 0;
-			animatePath();
+		if (hasSelectedCell()) {
+			// User clicked empty cell - let's find path to it
+			var path = findPath(selectedCellId, cell.id);
+			if (path == null) {
+				// path not found
+				console.log("path not found from " + selectedCellId + " to " + cell.id);
+			}
+			else {
+				console.log("path is found: " + path);
+				animation = true;
+				animationPath = path;
+				animationStep = 0;
+				animatePath();
+			}
 		}
 	}
 	else {
 		// User clicked filled cell - let's select it.
+		
+		if (hasSelectedCell()) {
+			// unselect the previous selected
+			getSelectedCell().removeClass(cellStyles[selectedCellId]);
+		}
+		
 		selectedCellId = cell.id;
 	}
 }
 
-function animatePath() {
+var animatePath = function() {
 	// console.log("animate (" + animationPath + "; step=" + animationStep + ")");
 	var cell = getCell(animationPath[animationStep]);
 	cell.addClass(cellStyles[selectedCellId]);
@@ -123,7 +165,7 @@ function animatePath() {
 	}
 	if (animationStep < animationPath.length-1) {
 		animationStep++;
-		setTimeout("animatePath()", 100);
+		setTimeout(animatePath, 100);
 	}
 	else {
 		//console.log("animate: fillCell(" + animationPath[animationStep] + " with style" + cellStyles[selectedCellId] + ")");
@@ -132,7 +174,7 @@ function animatePath() {
 		animationPath = null;
 		animationStep = -1;
 		animation = false;
-		fillNextCells();
+		enqueue(fillNextCells);
 	}
 }
 
@@ -203,23 +245,17 @@ function findPath(fromCellId, toCellId) {
 }
 
 function hasSelectedCell() {
-	return (selectedCellId > -1)
+	return selectedCellId > -1;
 }
 
-function paint() {
+var paint = function() {
 	if (!gameStarted) {
 		return;
 	}
 	
 	if (!animation && hasSelectedCell()) {
-		var cell = getSelectedCell();
-		if (cell.hasClass(cellStyles[selectedCellId])) {
-			cell.removeClass(cellStyles[selectedCellId]);	// TODO Draw a little bit shifted image to create movement affect
-		}
-		else {
-			cell.addClass(cellStyles[selectedCellId]);
-		}
+		getSelectedCell().toggleClass('selectedHightlightedCell');
 	}
 	
-	setTimeout("paint()", 300);
+	setTimeout(paint, 300);
 }
