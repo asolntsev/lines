@@ -9,6 +9,7 @@ var animation = false;
 var animationPath;
 var animationStep;
 
+var blinkSelectedCellThread;
 var eventProcessingThread;
 var queue = [];
 
@@ -46,14 +47,17 @@ function createField() {
 }
  
 var startGame = function() {
+	animation = false;
 	selectedCellId = -1;
+	clearTimeout(blinkSelectedCellThread);
+	
 	freeCells = width*height;
 	
 	for (var i=0; i < width*height; i++) {
 		cellStyles[i] = "";
 		getCell(i).removeClass( 'filled' );
 	}
-	
+
 	gameStarted = true;
 	enqueue(fillNextCells);
  }
@@ -90,7 +94,7 @@ var fillNextCells = function() {
 		// console.log("next cell: " + cellId);
 		fillCell(cellId, getRandomStyle());
 	}
-	enqueue(paint);
+	enqueue(blinkSelectedCell);
  }
  
  function fillCell(cellId, cellStyle) {
@@ -129,13 +133,14 @@ function onCellClicked(cell) {
 	if (cellStyles[cell.id] == "") {
 		if (hasSelectedCell()) {
 			// User clicked empty cell - let's find path to it
+			console.log("Find path from " + selectedCellId + " to " + cell.id);
 			var path = findPath(selectedCellId, cell.id);
 			if (path == null) {
 				// path not found
 				console.log("path not found from " + selectedCellId + " to " + cell.id);
 			}
 			else {
-				console.log("path is found: " + path);
+				console.log("path is found: " + path+", start animation from " + selectedCellId + " to " + cell.id);
 				animation = true;
 				animationPath = path;
 				animationStep = 0;
@@ -148,10 +153,12 @@ function onCellClicked(cell) {
 		
 		if (hasSelectedCell()) {
 			// unselect the previous selected
-			getSelectedCell().removeClass(cellStyles[selectedCellId]);
+			getSelectedCell().removeClass('selectedHightlightedCell');			
+			clearTimeout(blinkSelectedCellThread);
 		}
 		
 		selectedCellId = cell.id;
+		enqueue(blinkSelectedCell);
 	}
 }
 
@@ -248,14 +255,13 @@ function hasSelectedCell() {
 	return selectedCellId > -1;
 }
 
-var paint = function() {
+var blinkSelectedCell = function() {
 	if (!gameStarted) {
 		return;
 	}
 	
 	if (!animation && hasSelectedCell()) {
 		getSelectedCell().toggleClass('selectedHightlightedCell');
+		blinkSelectedCellThread = setTimeout(blinkSelectedCell, 300);
 	}
-	
-	setTimeout(paint, 300);
 }
