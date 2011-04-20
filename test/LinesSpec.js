@@ -65,12 +65,26 @@ describe("Lines", function() {
 		});
 		
 		it("clicking another ball unselects the previous one", function() {
+			startGame();
+			fillNextCells();
+			
+			expect(filledCells().length).toEqual(3);
+			
 			var cellId1 = $(filledCells()[0]).attr('id');
 			var cellId2 = $(filledCells()[1]).attr('id');
+			var style1 = cellStyles[cellId1];
+			var style2 = cellStyles[cellId2];
+			
 			getCell(cellId1).click();
 			expect(selectedCellId).toEqual(cellId1);
+			expect(animation).toBe(false);
+			
 			getCell(cellId2).click();
 			expect(selectedCellId).toEqual(cellId2);
+			
+			expect(animation).toBe(false);
+			expect(getCell(cellId1).hasClass(style1)).toBe(true);
+			expect(getCell(cellId2).hasClass(style2)).toBe(true);
 		});
 		
 		it("if user clicks empty cell, nothing happens", function() {
