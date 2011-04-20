@@ -7,6 +7,10 @@
 	background-position: center center;
 }
 
+.selectedHightlightedCell {
+	background-position: right top;
+}
+
 .style0 {
 	background-image: url(img/collaboration.png);
 }
