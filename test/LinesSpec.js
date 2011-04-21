@@ -3,7 +3,7 @@ describe("Lines", function() {
 	startGame();
 
 	beforeEach(function() {
-		queue = [];
+//		resetQueue();
 	});
 	
 	describe("when page is opened", function() {
@@ -35,25 +35,28 @@ describe("Lines", function() {
 			expect(filledCells().length).toEqual(3);
 		});
 		it("user can move any ball to another free cell", function() {
-			var filledCellId = findFilledCellId();
-			var emptyCellId = findEmptyCellId();
-			getCell(filledCellId).click();
-			expect(selectedCellId).toEqual(filledCellId);
-			getCell(emptyCellId).click();
+			var filledCell = '13';
+			var emptyCell = '79';
+			fillCell(filledCell, "style4");
+			getCell(filledCell).click();
+			expect(selectedCellId).toEqual(filledCell);
+			getCell(emptyCell).click();
 			
 			expect(animation).toBe(true);
+			expectEnqueued(blinkSelectedCell, animatePath);
 		});		
 	});
 
 	describe("Movement", function() {
-		it("user clicks one of balls", function() {
-			var cellId = findFilledCellId();
-			getCell(cellId).click();
-			expect(selectedCellId).toEqual(cellId);
-		});
-		
-		it("the selected ball starts blinking", function() {
-			// TODO
+		it("user clicks one of balls - it starts blinking", function() {
+			startGame();
+			resetQueue();
+			fillCell('22', "style4");
+			expect(animation).toBe(false);
+
+			getCell('22').click();
+			expect(selectedCellId).toEqual('22');
+			expectEnqueued(blinkSelectedCell);
 		});
 		
 		it("clicking the same cell does not take effect", function() {
@@ -66,31 +69,28 @@ describe("Lines", function() {
 		
 		it("clicking another ball unselects the previous one", function() {
 			startGame();
-			fillNextCells();
+			fillCell(12, "style1");
+			fillCell(76, "style2");
+			fillCell(99, "style3");
 			
 			expect(filledCells().length).toEqual(3);
 			
-			var cellId1 = $(filledCells()[0]).attr('id');
-			var cellId2 = $(filledCells()[1]).attr('id');
-			var style1 = cellStyles[cellId1];
-			var style2 = cellStyles[cellId2];
-			
-			getCell(cellId1).click();
-			expect(selectedCellId).toEqual(cellId1);
+			getCell(12).click();
+			expect(selectedCellId).toEqual('12');
 			expect(animation).toBe(false);
 			
-			getCell(cellId2).click();
-			expect(selectedCellId).toEqual(cellId2);
+			getCell(76).click();
+			expect(selectedCellId).toEqual('76');
 			
 			expect(animation).toBe(false);
-			expect(getCell(cellId1).hasClass(style1)).toBe(true);
-			expect(getCell(cellId2).hasClass(style2)).toBe(true);
+			expect(getCell(12).hasClass("style1")).toBe(true);
+			expect(getCell(76).hasClass("style2")).toBe(true);
 		});
 		
 		it("if user clicks empty cell, nothing happens", function() {
 			startGame();
 			resetQueue();
-			var cellId = findEmptyCellId();
+			getCell(34).click();
 			expectNothingEnqueued();
 			expectNothingSelected();
 		});

@@ -144,7 +144,7 @@ function onCellClicked(cell) {
 				animation = true;
 				animationPath = path;
 				animationStep = 0;
-				animatePath();
+				enqueue(animatePath);
 			}
 		}
 	}
@@ -197,7 +197,7 @@ function findPath(fromCellId, toCellId) {
 	if (fromCellId == toCellId) {
 		return;
 	}
-	var steps = new Array();
+	var steps = [];
 	for (var i=0; i<width*height; i++) {
 		steps[i] = 0;
 		getCell(i).append("");
@@ -208,7 +208,7 @@ function findPath(fromCellId, toCellId) {
 
 	search:
 	while (true) {
-		var nextWaveCells = new Array();
+		var nextWaveCells = [];
 		// console.log("Start wave: " + currentWaveCells);
 		for (var j=0; j<currentWaveCells.length; j++) {
 			if (currentWaveCells[j] == toCellId) {
@@ -238,7 +238,7 @@ function findPath(fromCellId, toCellId) {
 	
 	
 	// Restore the path
-	var path = new Array();
+	var path = [];
 	var currentPathCell = toCellId;
 	while (currentPathCell != fromCellId) {
 		path.push(currentPathCell);

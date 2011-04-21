@@ -1,5 +1,13 @@
-function expectEnqueued(func) {
-	expect(queue[0]).toEqual(func);
+function expectEnqueued(func1, func2, func3) {
+	if (func1) {
+		expect(queue[0]).toEqual(func1);
+		if (func2) {
+			expect(queue[1]).toEqual(func2);
+			if (func3) {
+				expect(queue[2]).toEqual(func3);
+			}
+		}
+	}
 }
 
 function expectNothingEnqueued() {
@@ -22,10 +30,6 @@ function filledCells() {
 	return $.find("td.filled");
 }
 
-function findFilledCellId() {
-	return $($.find("td.filled:first")).attr('id');
-}
-
-function findEmptyCellId() {
-	return $($.find("td:not(.filled):first")).attr('id');
-}
+beforeEach(function() {
+	resetQueue();
+});
