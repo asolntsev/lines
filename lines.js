@@ -54,8 +54,9 @@ var startGame = function() {
 	freeCells = width*height;
 	
 	for (var i=0; i < width*height; i++) {
-		cellStyles[i] = "";
 		getCell(i).removeClass( 'filled' );
+		// getCell(i).removeClass( cellStyles[i] );
+		cellStyles[i] = "";
 	}
 
 	gameStarted = true;
@@ -79,7 +80,7 @@ var gameOver = function() {
 
 function _findFreeCell() {
 	var cellId = getRandomCellId();
-	while (cellStyles[cellId] != "") {
+	while (!isEmpty(cellId)) {
 		var cellId = getRandomCellId();
 	}
 	return cellId;
@@ -116,10 +117,11 @@ function getSelectedCell() {
  * The main click handler for cells
  */
 function onCellClicked(cell) {
+	var cellId = parseInt(cell.id);
 	if (!gameStarted || animation) {
 		return;
 	}
-	else if (cell.id == selectedCellId) {
+	else if (cellId == selectedCellId) {
 		// clicked the same cell. Nothing to do.
 		return;
 	}
@@ -130,17 +132,17 @@ function onCellClicked(cell) {
 	}
 	*/
 	
-	if (cellStyles[cell.id] == "") {
+	if (isEmpty(cellId)) {
 		if (hasSelectedCell()) {
 			// User clicked empty cell - let's find path to it
-			console.log("Find path from " + selectedCellId + " to " + cell.id);
-			var path = findPath(selectedCellId, cell.id);
+			console.log("Find path from " + selectedCellId + " to " + cellId);
+			var path = findPath(selectedCellId, cellId);
 			if (path == null) {
 				// path not found
-				console.log("path not found from " + selectedCellId + " to " + cell.id);
+				console.log("path not found from " + selectedCellId + " to " + cellId);
 			}
 			else {
-				console.log("path is found: " + path+", start animation from " + selectedCellId + " to " + cell.id);
+				console.log("path is found: " + path+", start animation from " + selectedCellId + " to " + cellId);
 				animation = true;
 				animationPath = path;
 				animationStep = 0;
@@ -157,7 +159,7 @@ function onCellClicked(cell) {
 			clearTimeout(blinkSelectedCellThread);
 		}
 		
-		selectedCellId = cell.id;
+		selectedCellId = cellId;
 		enqueue(blinkSelectedCell);
 	}
 }
@@ -167,8 +169,19 @@ var animatePath = function() {
 	var cell = getCell(animationPath[animationStep]);
 	cell.addClass(cellStyles[selectedCellId]);
 	if (animationStep > 0) {
-		var previousCell = getCell(animationPath[animationStep-1]);
+		var previousCellId = animationPath[animationStep-1];
+		var previousCell = getCell(previousCellId);
+		if (!previousCell.hasClass(cellStyles[selectedCellId])) {
+			throw "Previous cell in the path ("+previousCellId+") hasn't class " + cellStyles[selectedCellId] + " (path=" +animationPath+")";
+		}
+		
 		previousCell.removeClass(cellStyles[selectedCellId]);
+		if (!isEmpty(animationPath[animationStep])) {
+			throw "Some of cells in path is not empty: " + animationPath[animationStep] + ", but has class " + cellStyles[animationPath[animationStep]] + " (path=" + animationPath + ")";
+		}
+		if (cell.hasClass('filled')) { 
+			throw "Some of cells in path is filled: " + animationPath[animationStep] + " (path=" + animationPath + ")";
+		}
 	}
 	if (animationStep < animationPath.length-1) {
 		animationStep++;
@@ -177,6 +190,7 @@ var animatePath = function() {
 	else {
 		//console.log("animate: fillCell(" + animationPath[animationStep] + " with style" + cellStyles[selectedCellId] + ")");
 		fillCell(animationPath[animationStep], cellStyles[selectedCellId]);
+		// TODO check if a full line has been arised - then delete it and increase player score
 		selectedCellId = -1;
 		animationPath = null;
 		animationStep = -1;
@@ -185,8 +199,12 @@ var animatePath = function() {
 	}
 }
 
+function isEmpty(cellId) {
+	return cellStyles[cellId] == "";
+}
+
 function tryToAddCell(steps, nextWaveCells, currentCellId, nextCellId) {
-	if (steps[nextCellId] == 0 && cellStyles[nextCellId] == "") {
+	if (steps[nextCellId] == -1 && isEmpty(nextCellId)) {
 		nextWaveCells.push(nextCellId);
 		steps[nextCellId] = currentCellId;
 		// getCell(nextCellId).append(""+currentCellId);
@@ -199,15 +217,20 @@ function findPath(fromCellId, toCellId) {
 	}
 	var steps = [];
 	for (var i=0; i<width*height; i++) {
-		steps[i] = 0;
-		getCell(i).append("");
+		steps[i] = -1;
+		// getCell(i).append(""); // wtf?
 	}
 	steps[fromCellId] = fromCellId;
-	var currentWaveCells = Array();
+	var currentWaveCells = [];
 	currentWaveCells.push(fromCellId);
 
+	var waveNumber = 0;
 	search:
-	while (true) {
+	while (currentWaveCells.length > 0) {
+		if (waveNumber++ > width*height) {
+			throw "Too many waves: " + waveNumber;
+		}
+		
 		var nextWaveCells = [];
 		// console.log("Start wave: " + currentWaveCells);
 		for (var j=0; j<currentWaveCells.length; j++) {
@@ -243,6 +266,9 @@ function findPath(fromCellId, toCellId) {
 	while (currentPathCell != fromCellId) {
 		path.push(currentPathCell);
 		currentPathCell = steps[currentPathCell];
+		if (path.length > width * height) {
+			throw "Too long path: " + path;
+		}
 	};
 	path.push(fromCellId);
 	path = path.reverse();
