@@ -142,14 +142,14 @@ function onCellClicked(cell) {
 	if (isEmpty(cellId)) {
 		if (hasSelectedCell()) {
 			// User clicked empty cell - let's find path to it
-			console.log("Find path from " + selectedCellId + " to " + cellId);
+			//console.log("Find path from " + selectedCellId + " to " + cellId);
 			var path = findPath(selectedCellId, cellId);
 			if (path == null) {
 				// path not found
-				console.log("path not found from " + selectedCellId + " to " + cellId);
+				//console.log("path not found from " + selectedCellId + " to " + cellId);
 			}
 			else {
-				console.log("path is found: " + path+", start animation from " + selectedCellId + " to " + cellId);
+				//console.log("path is found: " + path+", start animation from " + selectedCellId + " to " + cellId);
 				animation = true;
 				animationPath = path;
 				animationStep = 0;
@@ -201,13 +201,58 @@ var animatePath = function(ultrafast) {
 		//console.log("animate: fillCell(" + animationPath[animationStep] + " with style" + cellStyles[selectedCellId] + ")");
 		fillCell(animationPath[animationStep], cellStyles[selectedCellId]);
 		clearCell(selectedCellId);
-		// TODO check if a full line has been arised - then delete it and increase player score
+		/*var detectedFigures = detectFigures(animationPath[animationStep]);
+		if (detectedFigures.length > 0) {
+			// TODO if a full line has been arised - then delete it and increase player score
+		}*/
 		selectedCellId = -1;
 		animationPath = null;
 		animationStep = -1;
 		animation = false;
 		enqueue(fillNextCells);
 	}
+}
+
+function detectFigures(cellId) {
+	var horisontalLineLeftPart = goAlongLine(cellId, {x:-1,y:0});
+	var horisontalLineRightPart = goAlongLine(cellId, {x:1,y:0});
+	var verticalLineUpperPart = goAlongLine(cellId, {x:0,y:-1});
+	var verticalLineLowerPart = goAlongLine(cellId, {x:0,y:1});
+	
+	var diagonalLeftPart = goAlongLine(cellId, {x:-1,y:-1});
+	var diagonalRightPart = goAlongLine(cellId, {x:1,y:1});
+	var ortoDiagonalLeftPart = goAlongLine(cellId, {x:-1,y:1});
+	var ortoDiagonalRightPart = goAlongLine(cellId, {x:1,y:-1});
+	
+	var figures = [];
+	addFigure(figures, horisontalLineLeftPart, horisontalLineRightPart);
+	addFigure(figures, verticalLineUpperPart, verticalLineLowerPart);
+	addFigure(figures, diagonalLeftPart, diagonalRightPart);
+	addFigure(figures, ortoDiagonalLeftPart, ortoDiagonalRightPart);
+	return figures;
+}
+
+function addFigure(result, linePart1, linePart2) {
+	if (linePart1.length + linePart2.length > 5) {
+		linePart2.shift();
+		var line = linePart1.concat(linePart2);
+		result.push(line);
+	}
+	return result;
+}
+
+function goAlongLine(cellId, direction) {
+	var lineStyle = cellStyles[cellId];
+	var result = [];
+	var x = _x(cellId);
+	var y = _y(cellId);
+	
+	while (x >= 0 && x < width && y >= 0 && y < height && cellStyles[width*y+x] == lineStyle) {
+		result.push(width*y+x);
+		x += direction.x;
+		y += direction.y;
+	}
+	return result;
 }
 
 function isEmpty(cellId) {
@@ -220,6 +265,14 @@ function tryToAddCell(steps, nextWaveCells, currentCellId, nextCellId) {
 		steps[nextCellId] = currentCellId;
 		// getCell(nextCellId).append(""+currentCellId);
 	}
+}
+
+function _x(cellId) {
+	return cellId % width;
+}
+
+function _y(cellId) {
+	return Math.floor(cellId/width);
 }
 
 function findPath(fromCellId, toCellId) {
@@ -249,21 +302,21 @@ function findPath(fromCellId, toCellId) {
 				// path is found
 				break search;
 			}
-			if (currentWaveCells[j] % width > 0)
+			if (_x(currentWaveCells[j]) > 0)
 				tryToAddCell(steps, nextWaveCells, currentWaveCells[j], currentWaveCells[j]-1);
-			if (currentWaveCells[j] % width < width-1)
+			if (_x(currentWaveCells[j]) < width-1)
 				tryToAddCell(steps, nextWaveCells, currentWaveCells[j], currentWaveCells[j]+1);
-			if (currentWaveCells[j] >= width)
+			if (_y(currentWaveCells[j]) > 0)
 				tryToAddCell(steps, nextWaveCells, currentWaveCells[j], currentWaveCells[j]-width);
-			if (currentWaveCells[j] < width*height-width)
+			if (_y(currentWaveCells[j]) < height)
 				tryToAddCell(steps, nextWaveCells, currentWaveCells[j], currentWaveCells[j]+width);
 		}
 		// alert("Wave done: " + nextWaveCells);
 		
 		if (nextWaveCells.length == 0) {
 			// path is not found
-			console.log("Path is not found.. fromCellId=" + fromCellId + ", toCellId=" + toCellId + 
-				", steps[fromCellId]=" + steps[fromCellId] + ", steps[toCellId]="+steps[toCellId]);
+			//console.log("Path is not found.. fromCellId=" + fromCellId + ", toCellId=" + toCellId + 
+			//	", steps[fromCellId]=" + steps[fromCellId] + ", steps[toCellId]="+steps[toCellId]);
 			return null;
 		}
 		
