@@ -90,6 +90,20 @@ describe("Lines", function() {
 			expectNothingEnqueued();
 			expectNothingSelected();
 		});
+		
+		it("ball movement in animated", function(){
+			fillCell(13, "style1");
+			getCell(13).click();
+			getCell(17).click();
+			console.log(queue);
+			expectEnqueued(blinkSelectedCell, animatePath);
+			
+			resetQueue();
+			// animationPath = [13, 14, 15, 16, 17];
+			animatePath(true);
+			console.log(queue);
+			expectEnqueued(fillNextCells);
+		});
 
 	});
 

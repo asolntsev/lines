@@ -164,7 +164,7 @@ function onCellClicked(cell) {
 	}
 }
 
-var animatePath = function() {
+var animatePath = function(ultrafast) {
 	// console.log("animate (" + animationPath + "; step=" + animationStep + ")");
 	var cell = getCell(animationPath[animationStep]);
 	cell.addClass(cellStyles[selectedCellId]);
@@ -185,7 +185,10 @@ var animatePath = function() {
 	}
 	if (animationStep < animationPath.length-1) {
 		animationStep++;
-		setTimeout(animatePath, 100);
+		if (ultrafast) 
+			animatePath(ultrafast);
+		else
+			setTimeout(animatePath, 100);
 	}
 	else {
 		//console.log("animate: fillCell(" + animationPath[animationStep] + " with style" + cellStyles[selectedCellId] + ")");
