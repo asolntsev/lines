@@ -105,6 +105,13 @@ var fillNextCells = function() {
 	freeCells--;
  }
  
+function clearCell(cellId) {
+	getCell(cellId).removeClass( 'filled' );
+	getCell(cellId).removeClass( cellStyles[cellId] );
+	cellStyles[cellId] = '';
+	freeCells++;
+}
+ 
  function getCell(cellNr) {
 	return $("#"+cellNr);
 }
@@ -193,6 +200,7 @@ var animatePath = function(ultrafast) {
 	else {
 		//console.log("animate: fillCell(" + animationPath[animationStep] + " with style" + cellStyles[selectedCellId] + ")");
 		fillCell(animationPath[animationStep], cellStyles[selectedCellId]);
+		clearCell(selectedCellId);
 		// TODO check if a full line has been arised - then delete it and increase player score
 		selectedCellId = -1;
 		animationPath = null;

@@ -31,12 +31,10 @@ describe("Lines", function() {
 			expect(filledCells().length).toEqual(3);
 		});
 		it("user can move any ball to another free cell", function() {
-			var filledCell = 13;
-			var emptyCell = 79;
-			fillCell(filledCell, "style4");
-			getCell(filledCell).click();
-			expect(selectedCellId).toEqual(filledCell);
-			getCell(emptyCell).click();
+			fillCell(14, "style4");
+			getCell(14).click();
+			expect(selectedCellId).toEqual(14);
+			getCell(79).click();
 			
 			expect(animation).toBe(true);
 			expectEnqueued(blinkSelectedCell, animatePath);
@@ -92,17 +90,28 @@ describe("Lines", function() {
 		});
 		
 		it("ball movement in animated", function(){
-			fillCell(13, "style1");
+			fillCell(13, "style66");
 			getCell(13).click();
 			getCell(17).click();
-			console.log(queue);
 			expectEnqueued(blinkSelectedCell, animatePath);
 			
 			resetQueue();
-			// animationPath = [13, 14, 15, 16, 17];
 			animatePath(true);
-			console.log(queue);
 			expectEnqueued(fillNextCells);
+			expect(filledCells().length).toEqual(1);
+			expect(freeCells).toEqual(99);
+			expect(animation).toBe(false);
+			expect(animationPath).toBe(null);
+			
+			for (var i=0; i<100; i++) {
+				var cell = getCell(i);
+				expect(cell.hasClass('filled')).toBe(i == 17);
+				expect(cell.hasClass('style66')).toBe(i == 17);
+				if (i == 17)
+					expect(cellStyles[i]).toEqual("style66");
+				else
+					expect(cellStyles[i]).toEqual("");
+			}
 		});
 
 	});
