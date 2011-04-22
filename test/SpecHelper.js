@@ -30,6 +30,23 @@ function filledCells() {
 	return $.find("td.filled");
 }
 
+function fillCells() {
+	for( var i = 0; i < arguments.length; i++ ) {
+		fillCell(arguments[i], "style22");
+	}
+}
+
+var sortNumber = function (a,b) {
+	return a - b;
+}
+
+function sortr(multiArray) {
+	for (var i=0; i<multiArray.length; i++) {
+		multiArray[i] = multiArray[i].sort(sortNumber);
+	}
+	return multiArray;
+}
+
 beforeEach(function() {
 	resetQueue();
 });
