@@ -22,6 +22,10 @@ describe("Lines", function() {
 		it("the game is automatically started", function() {
 			expect(gameStarted).toBe(true);
 		});
+		
+		it("player score is 0", function() {
+			expect(score).toEqual(0);
+		});
 	});
 	
 	describe("during every iteration", function() {
@@ -42,8 +46,17 @@ describe("Lines", function() {
 		it("when balls compose a figure, they are destroyed, and user score increases", function() {
 			startGame();
 			resetQueue();
-			fillCells(1,2,3,4,5);
-			// TODO
+			fillCells(1,2,3,4,8);
+			getCell(8).click();
+			getCell(5).click();
+			expectEnqueued(blinkSelectedCell, animatePath);
+			animatePath(true);
+			resetQueue();
+			
+			expect(score).toEqual(5);
+			expect(freeCells).toEqual(100);
+			expect(filledCells().length).toEqual(0);
+			// expectEnqueued();
 		});
 	});
 

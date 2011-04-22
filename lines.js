@@ -1,5 +1,6 @@
 var width = 10;
 var height = 10;
+var score = 0;
 var selectedCellId = -1;
 var freeCells;
 var cellStyles=[];
@@ -47,6 +48,7 @@ function createField() {
 }
  
 var startGame = function() {
+	score = 0;
 	animation = false;
 	selectedCellId = -1;
 	clearTimeout(blinkSelectedCellThread);
@@ -199,17 +201,32 @@ var animatePath = function(ultrafast) {
 	}
 	else {
 		//console.log("animate: fillCell(" + animationPath[animationStep] + " with style" + cellStyles[selectedCellId] + ")");
-		fillCell(animationPath[animationStep], cellStyles[selectedCellId]);
+		targetCellId = animationPath[animationStep];
+		
+		fillCell(targetCellId, cellStyles[selectedCellId]);
 		clearCell(selectedCellId);
-		/*var detectedFigures = detectFigures(animationPath[animationStep]);
-		if (detectedFigures.length > 0) {
-			// TODO if a full line has been arised - then delete it and increase player score
-		}*/
+
 		selectedCellId = -1;
 		animationPath = null;
 		animationStep = -1;
 		animation = false;
+		
+		ballAdded(targetCellId);
 		enqueue(fillNextCells);
+	}
+}
+
+var ballAdded = function(cellId) {
+	if (!isEmpty(cellId)) {
+		var detectedFigures = detectFigures(cellId);
+		if (detectedFigures.length > 0) {
+			for (var i=0; i<detectedFigures.length; i++) {
+				score += detectedFigures[i].length * detectedFigures.length;
+				for (var j=0; j<detectedFigures[i].length; j++) {
+					clearCell(detectedFigures[i][j]);
+				}
+			}
+		}
 	}
 }
 
