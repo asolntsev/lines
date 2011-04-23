@@ -1,0 +1,67 @@
+.cell {
+	border: double;
+	width: 40px;
+	height: 40px;
+	background-color: white; 
+	background-repeat: no-repeat;
+	background-position: center center;
+}
+
+.selectedHightlightedCell {
+	background-position: right top;
+}
+
+.style0 {
+	background-image: url(img/collaboration.png);
+}
+
+.style1 {
+	background-image: url(img/bank.png);
+}
+
+.style2 {
+	background-image: url(img/current-work.png);
+}
+
+.style3 {
+	background-image: url(img/heart.png);
+}
+
+.style4 {
+	background-image: url(img/home.png);
+}
+
+.style5 {
+	background-image: url(img/pencil.png);
+}
+
+.style6 {
+	background-image: url(img/plus.png);
+}
+
+.style7 {
+	background-image: url(img/premium.png);
+}
+
+.style8 {
+	background-image: url(img/product-1.png);
+}
+
+.style9 {
+	background-image: url(img/product.png);
+}
+
+.style10 {
+	background-image: url(img/refresh.png);
+}
+.style11 {
+	background-image: url(img/settings.png);
+}
+
+.style12 {
+	background-image: url(img/star.png);
+}
+
+.style13 {
+	background-image: url(img/user.png);
+}
