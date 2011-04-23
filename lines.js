@@ -32,7 +32,8 @@ var stopEventProcessingThread = function() {
 
 function createField() {
 	var gameArea = $("#gameArea");
-	var html = "<table>";
+	var html = "<h3>Score: <span id='score'>0</span></h3>";
+	html += "<table>";
 	for (var y=0; y<height; y++) {
 		html = html + "<tr>";
 		for (var x=0; x<width; x++) {
@@ -46,9 +47,14 @@ function createField() {
 	gameArea.append(html);
 	return gameArea;
 }
- 
+
+function showScore() {
+	$("#score").text(score);
+} 
+
 var startGame = function() {
 	score = 0;
+	showScore();
 	animation = false;
 	selectedCellId = -1;
 	clearTimeout(blinkSelectedCellThread);
@@ -94,7 +100,6 @@ var fillNextCells = function() {
 	}
 	for (var i=0; i<3; i++) {
 		var cellId = _findFreeCell();
-		// console.log("next cell: " + cellId);
 		fillCell(cellId, getRandomStyle());
 	}
 	enqueue(blinkSelectedCell);
@@ -194,10 +199,14 @@ var animatePath = function(ultrafast) {
 	}
 	if (animationStep < animationPath.length-1) {
 		animationStep++;
-		if (ultrafast) 
+		if (ultrafast && ultrafast == 'fast') {
+			//console.log({ultrafast:ultrafast});
 			animatePath(ultrafast);
-		else
+		}
+		else {
+			//console.log("setTimeout(animatePath, 100);");
 			setTimeout(animatePath, 100);
+		}
 	}
 	else {
 		//console.log("animate: fillCell(" + animationPath[animationStep] + " with style" + cellStyles[selectedCellId] + ")");
@@ -226,6 +235,7 @@ var ballAdded = function(cellId) {
 					clearCell(detectedFigures[i][j]);
 				}
 			}
+			showScore();
 		}
 	}
 }
