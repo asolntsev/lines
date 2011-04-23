@@ -1,1 +1,21 @@
-that's readdddme
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>js Lines</title>
+		<link rel="stylesheet" type="text/css" href="https://github.com/asolntsev/lines/raw/master/lines.css" />
+		<script type="text/javascript" src="https://github.com/asolntsev/lines/raw/master/jquery-1.4.2.js"></script>
+		<script type="text/javascript" src="https://github.com/asolntsev/lines/raw/master/lines.js"></script>
+		<script type="text/javascript">
+			jQuery(document).ready(function(){
+				createField();
+				startGame();
+				runEventProcessingThread();
+			 });
+		</script>
+	</head>
+	<body>
+		<h1>jsLines</h1>
+		<div id="gameArea"></div>
+		&copy;2000-2011 Andrei Solntsev
+	</body>
+</html>
