@@ -1,7 +1,15 @@
-var width = 10;
-var height = 10;
+var settings = {
+	width: 10,
+	height: 10,
+	numberOfFirstBalls: 5,
+	numberOfNextBalls: 3,
+	colors: 7,
+	lineLength: 5
+};
+
 var score = 0;
 var selectedCellId = -1;
+var cellsToFill;
 var freeCells;
 var cellStyles=[];
 var gameStarted = false;
@@ -34,11 +42,11 @@ function createField() {
 	var gameArea = $("#gameArea");
 	var html = "<h3>Score: <span id='score'>0</span></h3>";
 	html += "<table>";
-	for (var y=0; y<height; y++) {
+	for (var y=0; y<settings.height; y++) {
 		html = html + "<tr>";
-		for (var x=0; x<width; x++) {
+		for (var x=0; x<settings.width; x++) {
 			<!-- "<img src='img/collaboration.png' id='" + x + "-" + y + "'/>" -->
-			var cellId = (x+y*width);
+			var cellId = (x+y*settings.width);
 			html = html + "<td class='cell' onClick='onCellClicked(this);' id='" + cellId + "'>&nbsp;</td>";
 		}
 		html = html + "</tr>";
@@ -59,9 +67,10 @@ var startGame = function() {
 	selectedCellId = -1;
 	clearTimeout(blinkSelectedCellThread);
 	
-	freeCells = width*height;
+	freeCells = settings.width*settings.height;
+	cellsToFill = settings.numberOfFirstBalls;
 	
-	for (var i=0; i < width*height; i++) {
+	for (var i=0; i < settings.width*settings.height; i++) {
 		getCell(i).removeClass( 'filled' );
 		// getCell(i).removeClass( cellStyles[i] );
 		cellStyles[i] = "";
@@ -72,11 +81,11 @@ var startGame = function() {
  }
  
  function getRandomCellId() {
-	return Math.floor(width*height*Math.random());
+	return Math.floor(settings.width*settings.height*Math.random());
  }
  
 function getRandomStyle() {
-	return "style" + Math.floor(14*Math.random());
+	return "style" + Math.floor(settings.colors*Math.random());
 }
 
 var gameOver = function() {
@@ -95,13 +104,14 @@ function _findFreeCell() {
 }
 
 var fillNextCells = function() {
-	 if (freeCells < 3) {
+	if (freeCells < cellsToFill) {
 		enqueue(gameOver);
 	}
-	for (var i=0; i<3; i++) {
+	for (var i=0; i<cellsToFill; i++) {
 		var cellId = _findFreeCell();
 		fillCell(cellId, getRandomStyle());
 	}
+	cellsToFill = settings.numberOfNextBalls;
 	enqueue(blinkSelectedCell);
  }
  
@@ -260,7 +270,7 @@ function detectFigures(cellId) {
 }
 
 function addFigure(result, linePart1, linePart2) {
-	if (linePart1.length + linePart2.length > 5) {
+	if (linePart1.length + linePart2.length > settings.lineLength) {
 		linePart2.shift();
 		var line = linePart1.concat(linePart2);
 		result.push(line);
@@ -274,8 +284,8 @@ function goAlongLine(cellId, direction) {
 	var x = _x(cellId);
 	var y = _y(cellId);
 	
-	while (x >= 0 && x < width && y >= 0 && y < height && cellStyles[width*y+x] == lineStyle) {
-		result.push(width*y+x);
+	while (x >= 0 && x < settings.width && y >= 0 && y < settings.height && cellStyles[settings.width*y+x] == lineStyle) {
+		result.push(settings.width*y+x);
 		x += direction.x;
 		y += direction.y;
 	}
@@ -295,11 +305,11 @@ function tryToAddCell(steps, nextWaveCells, currentCellId, nextCellId) {
 }
 
 function _x(cellId) {
-	return cellId % width;
+	return cellId % settings.width;
 }
 
 function _y(cellId) {
-	return Math.floor(cellId/width);
+	return Math.floor(cellId/settings.width);
 }
 
 function findPath(fromCellId, toCellId) {
@@ -307,7 +317,7 @@ function findPath(fromCellId, toCellId) {
 		return;
 	}
 	var steps = [];
-	for (var i=0; i<width*height; i++) {
+	for (var i=0; i<settings.width*settings.height; i++) {
 		steps[i] = -1;
 		// getCell(i).append(""); // wtf?
 	}
@@ -318,7 +328,7 @@ function findPath(fromCellId, toCellId) {
 	var waveNumber = 0;
 	search:
 	while (currentWaveCells.length > 0) {
-		if (waveNumber++ > width*height) {
+		if (waveNumber++ > settings.width*settings.height) {
 			throw "Too many waves: " + waveNumber;
 		}
 		
@@ -331,12 +341,12 @@ function findPath(fromCellId, toCellId) {
 			}
 			if (_x(currentWaveCells[j]) > 0)
 				tryToAddCell(steps, nextWaveCells, currentWaveCells[j], currentWaveCells[j]-1);
-			if (_x(currentWaveCells[j]) < width-1)
+			if (_x(currentWaveCells[j]) < settings.width-1)
 				tryToAddCell(steps, nextWaveCells, currentWaveCells[j], currentWaveCells[j]+1);
 			if (_y(currentWaveCells[j]) > 0)
-				tryToAddCell(steps, nextWaveCells, currentWaveCells[j], currentWaveCells[j]-width);
-			if (_y(currentWaveCells[j]) < height)
-				tryToAddCell(steps, nextWaveCells, currentWaveCells[j], currentWaveCells[j]+width);
+				tryToAddCell(steps, nextWaveCells, currentWaveCells[j], currentWaveCells[j]-settings.width);
+			if (_y(currentWaveCells[j]) < settings.height)
+				tryToAddCell(steps, nextWaveCells, currentWaveCells[j], currentWaveCells[j]+settings.width);
 		}
 		// alert("Wave done: " + nextWaveCells);
 		
@@ -357,7 +367,7 @@ function findPath(fromCellId, toCellId) {
 	while (currentPathCell != fromCellId) {
 		path.push(currentPathCell);
 		currentPathCell = steps[currentPathCell];
-		if (path.length > width * height) {
+		if (path.length > settings.width * settings.height) {
 			throw "Too long path: " + path;
 		}
 	};
