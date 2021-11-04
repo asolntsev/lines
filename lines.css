@@ -8,6 +8,14 @@ body {
 	background-repeat: no-repeat;
 	background-size: cover;
 	height: 100%;
+	color: white;
+}
+
+#footer {
+	position: absolute;
+	bottom: 0;
+	right: 0;
+	color: darkgray;
 }
 
 #gameArea {
