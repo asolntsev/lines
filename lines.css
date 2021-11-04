@@ -1,10 +1,28 @@
+html {
+	height: 100%;
+}
+
+body {
+	background-image: url(img/lady-bug-background.jpeg);
+	background-position: center;
+	background-repeat: no-repeat;
+	background-size: cover;
+	height: 100%;
+}
+
+#gameArea {
+	margin-left: auto;
+	margin-right: auto;
+}
+
 .cell {
 	border: double;
 	width: 40px;
 	height: 40px;
-	background-color: white; 
+	background-color: white;
 	background-repeat: no-repeat;
 	background-position: center center;
+	background-size: 40px;
 }
 
 .selectedHightlightedCell {
@@ -12,56 +30,56 @@
 }
 
 .style0 {
-	background-image: url(img/collaboration.png);
+	background-image: url(img/lady-bug.png);
 }
 
 .style1 {
-	background-image: url(img/bank.png);
+	background-image: url(img/plagg.png);
 }
 
 .style2 {
-	background-image: url(img/current-work.png);
+	background-image: url(img/supercat.jpeg);
 }
 
 .style3 {
-	background-image: url(img/heart.png);
+	background-image: url(img/miraculous-ladybug.png);
 }
 
 .style4 {
-	background-image: url(img/home.png);
+	background-image: url(img/miraculous-ladybug-and-cat-noir-1.png);
 }
 
 .style5 {
-	background-image: url(img/pencil.png);
+	background-image: url(img/miraculousladybug-miraculous-ladybug-catnoir-yingyang-ladybug-and-cat.png);
 }
 
 .style6 {
-	background-image: url(img/plus.png);
+	background-image: url(img/ticky.jpg);
 }
 
 .style7 {
-	background-image: url(img/premium.png);
+	background-image: url(img/adrian.jpg);
 }
 
 .style8 {
-	background-image: url(img/product-1.png);
+	background-image: url(img/lady-bug.png);
 }
 
 .style9 {
-	background-image: url(img/product.png);
+	background-image: url(img/lady-bug.png);
 }
 
 .style10 {
-	background-image: url(img/refresh.png);
+	background-image: url(img/lady-bug.png);
 }
 .style11 {
-	background-image: url(img/settings.png);
+	background-image: url(img/lady-bug.png);
 }
 
 .style12 {
-	background-image: url(img/star.png);
+	background-image: url(img/lady-bug.png);
 }
 
 .style13 {
-	background-image: url(img/user.png);
+	background-image: url(img/lady-bug.png);
 }
