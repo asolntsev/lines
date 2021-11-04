@@ -40,7 +40,7 @@ var stopEventProcessingThread = function() {
 
 function createField() {
 	var gameArea = $("#gameArea");
-	var html = "<h3>Score: <span id='score'>0</span></h3>";
+	var html = "<h3>Счёт: <span id='score'>0</span></h3>";
 	html += "<table>";
 	for (var y=0; y<settings.height; y++) {
 		html = html + "<tr>";
